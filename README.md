@@ -19,27 +19,27 @@ flowchart TD
     classDef target fill:#7B1FA2,stroke:#4A148C,stroke-width:2px,color:white;
 
     %% Nodes
-    Website([Yahoo Finance Websites]) ::: target
+    Website([Yahoo Finance Websites])
     
     subgraph Local Environment [Local Python Environment (Outside Docker)]
-        Crawler(Crawler / Scraper) ::: python
-        MongoWorker(Mongo Worker) ::: python
-        ElasticWorker(Elastic Worker) ::: python
+        Crawler(Crawler / Scraper)
+        MongoWorker(Mongo Worker)
+        ElasticWorker(Elastic Worker)
     end
 
     subgraph Docker Ecosystem [Docker Network]
         subgraph Messaging [Message Broker]
-            Zookeeper(Zookeeper) ::: kafka
-            Kafka[(Apache Kafka\nTopic: scraped_articles)] ::: kafka
+            Zookeeper(Zookeeper)
+            Kafka[(Apache Kafka\nTopic: scraped_articles)]
         end
 
         subgraph ELK Stack [ELK Stack]
-            Logstash(Logstash\nUDP 5000) ::: elastic
-            Elasticsearch[(Elasticsearch)] ::: elastic
-            Kibana([Kibana\nDashboard]) ::: elastic
+            Logstash(Logstash\nUDP 5000)
+            Elasticsearch[(Elasticsearch)]
+            Kibana([Kibana\nDashboard])
         end
 
-        MongoDB[(MongoDB)] ::: db
+        MongoDB[(MongoDB)]
     end
 
     %% Flow/Connections
@@ -58,6 +58,13 @@ flowchart TD
     ElasticWorker -- "Index Data" --> Elasticsearch
     
     Kibana -- "Query Data & Logs" --> Elasticsearch
+
+    %% Assign Classes
+    class Website target;
+    class Crawler,MongoWorker,ElasticWorker python;
+    class Zookeeper,Kafka kafka;
+    class Logstash,Elasticsearch,Kibana elastic;
+    class MongoDB db;
 ```
 
 ### Component Details
@@ -81,60 +88,6 @@ flowchart TD
 3.  **Event-Driven Pipeline**: Decoupled ingestion ensures that database downtime or bottlenecks do not stop or slow down the crawler.
 4.  **Centralized Logging**: Seamlessly ships Python application logs to Logstash using a UDP handler.
 5.  **Full-Text Search & Analytics**: Query scraped articles dynamically using Kibana dashboards.
-
----
-
-## Getting Started
-
-### Prerequisites
-*   Python 3.8+
-*   Docker & Docker Compose
-*   Google Chrome (or Firefox) and the corresponding WebDriver (e.g., ChromeDriver) installed and in your system PATH.
-
-### 1. Installation & Environment Setup
-
-1.  Clone the repository:
-    ```bash
-    git clone https://github.com/amndzdzdz/Web-Crawler.git
-    cd Web-Crawler
-    ```
-
-2.  Install python dependencies locally:
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-### 2. Launch Infrastructure (Docker)
-
-Start MongoDB, Kafka, Zookeeper, and the ELK Stack in the background:
-```bash
-docker-compose up -d
-```
-
-Verify that all services are healthy and running:
-```bash
-docker-compose ps
-```
-
-### 3. Run the Workers (Kafka Consumers)
-
-In separate terminal sessions or background processes, start the consumers to handle database inserts:
-
-*   **MongoDB Worker**:
-    ```bash
-    python mongo_worker.py
-    ```
-*   **Elasticsearch Worker**:
-    ```bash
-    python elastic_worker.py
-    ```
-
-### 4. Run the Crawler
-
-Start the main web crawler:
-```bash
-python crawler.py
-```
 
 ---
 
