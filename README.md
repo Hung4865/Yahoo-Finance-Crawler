@@ -4,68 +4,11 @@ A highly scalable, decoupled, microservices-style Python web crawler optimized f
 
 ---
 
+
+
 ## System Architecture
 
-The project has been refactored from a synchronous monolithic script into a distributed, event-driven architecture to maximize throughput and ensure high reliability.
-
-```mermaid
-flowchart TD
-    %% Define Styles
-    classDef python fill:#306998,stroke:#FFE873,stroke-width:2px,color:white;
-    classDef docker fill:#2496ED,stroke:#0db7ed,stroke-width:2px,color:white;
-    classDef db fill:#4DB33D,stroke:#3F912E,stroke-width:2px,color:white;
-    classDef kafka fill:#E82D24,stroke:#C62118,stroke-width:2px,color:white;
-    classDef elastic fill:#005571,stroke:#00A8E1,stroke-width:2px,color:white;
-    classDef target fill:#7B1FA2,stroke:#4A148C,stroke-width:2px,color:white;
-
-    %% Nodes
-    Website([Yahoo Finance Websites])
-    
-    subgraph Local Environment [Local Python Environment (Outside Docker)]
-        Crawler(Crawler / Scraper)
-        MongoWorker(Mongo Worker)
-        ElasticWorker(Elastic Worker)
-    end
-
-    subgraph Docker Ecosystem [Docker Network]
-        subgraph Messaging [Message Broker]
-            Zookeeper(Zookeeper)
-            Kafka[(Apache Kafka\nTopic: scraped_articles)]
-        end
-
-        subgraph ELK Stack [ELK Stack]
-            Logstash(Logstash\nUDP 5000)
-            Elasticsearch[(Elasticsearch)]
-            Kibana([Kibana\nDashboard])
-        end
-
-        MongoDB[(MongoDB)]
-    end
-
-    %% Flow/Connections
-    Website -- "Selenium / Requests" --> Crawler
-    
-    Crawler -- "System Logs" --> Logstash
-    Logstash -- "Store Logs" --> Elasticsearch
-    
-    Crawler == "Publish (Producer)" ==> Kafka
-    Zookeeper -. "Manage State" .- Kafka
-    
-    Kafka == "Consume" ==> MongoWorker
-    Kafka == "Consume" ==> ElasticWorker
-    
-    MongoWorker -- "Insert Data" --> MongoDB
-    ElasticWorker -- "Index Data" --> Elasticsearch
-    
-    Kibana -- "Query Data & Logs" --> Elasticsearch
-
-    %% Assign Classes
-    class Website target;
-    class Crawler,MongoWorker,ElasticWorker python;
-    class Zookeeper,Kafka kafka;
-    class Logstash,Elasticsearch,Kibana elastic;
-    class MongoDB db;
-```
+![Sơ đồ kiến trúc hệ thống](arch.png)
 
 ### Component Details
 *   **Crawler / Scraper (Producer)**: Crawls sites, parses URLs, respects `robots.txt`, and uses Selenium to handle dynamically rendered content. Reuses Selenium WebDriver instances to avoid performance degradation. Scraped articles are published immediately to a Kafka topic.
