@@ -1,0 +1,8 @@
+lxml
+requests
+selenium
+beautifulsoup4
+pymongo
+elasticsearch
+python-logstash
+confluent-kafka
