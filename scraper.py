@@ -1,7 +1,4 @@
-"""
-Author:
-    Amin Dziri
-"""
+
 
 import time
 import json
