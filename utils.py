@@ -1,7 +1,3 @@
-"""
-Author:
-    Amin Dziri
-"""
 
 def read_initial_urls(path:str) -> list:
     """
