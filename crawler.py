@@ -1,4 +1,3 @@
-
 from utils import read_initial_urls, filter_urls
 from urllib.parse import urlsplit
 from urllib.robotparser import RobotFileParser
